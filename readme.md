@@ -1,6 +1,6 @@
-# CloudTrail Logs Collection via S3-SQS Infrastructure
+# AWS CloudTrail to Elastic - Log Collection Infrastructure via S3-SQS
 
-This Terraform configuration sets up an infrastructure to collect AWS CloudTrail logs. The logs are stored in an S3 bucket, and notifications are sent to an SQS queue. An EC2 instance with appropriate IAM permissions is created, but the Elastic Agent installation and configuration will be done manually.
+This Terraform configuration sets up an infrastructure to collect AWS CloudTrail logs and send them to Elastic Stack. The logs are stored in an S3 bucket, and notifications are sent to an SQS queue. An EC2 instance with appropriate IAM permissions is created for running Elastic Agent, but the agent installation and configuration will be done manually.
 
 ## Architecture
 
@@ -11,6 +11,52 @@ The setup includes:
 3. **SQS Queue**: Receives notifications when new logs are added to S3
 4. **EC2 Instance**: Pre-configured with IAM permissions to access S3 and SQS
 5. **IAM Roles & Policies**: Provides necessary permissions for log access
+
+```
+                 EXISTING SERVICES                 |            CREATED BY TERRAFORM
+                                                   |
+┌────────────────┐       ┌─────────────┐          |  ┌───────────────┐      ┌────────────────┐
+│                │       │             │          |  │               │      │                │
+│    AWS API     │ ───>  │  CloudTrail │ ────────>  │   S3 Bucket   │ ───> │   SQS Queue    │
+│    Activity    │       │[CONFIGURED] │          |  │  [CREATED]    │      │   [CREATED]    │
+│                │       │             │          |  │               │      │                │
+└────────────────┘       └─────────────┘          |  └───────────────┘      └────────┬───────┘
+                                                   |                                  │
+                                                   |                                  │
+                                                   |                                  ▼
+┌───────────────┐                                  |  ┌────────────────┐    ┌─────────────────┐
+│               │                                  |  │                │    │                 │
+│  Elastic Cloud│ <─────────────────────────────────  │  EC2 Instance  │    │  IAM Roles &    │
+│  [NOT CREATED]│                                  |  │   [CREATED]    │    │  Policies      │
+│               │                                  |  │                │    │  [CREATED]      │
+└───────────────┘                                  |  └────────────────┘    └─────────────────┘
+                                                   |   * Elastic Agent is NOT installed
+                                                   |     by this Terraform project
+```
+
+### Data Flow
+
+1. AWS service API calls generate CloudTrail events
+2. CloudTrail (created by this project) writes log files to the S3 bucket
+3. S3 bucket (created by this project) sends notifications to the SQS queue when new objects are created
+4. SQS queue (created by this project) holds notifications until they are processed
+5. EC2 instance (created by this project) with Elastic Agent (must be installed manually) polls the SQS queue for notifications
+6. Elastic Agent downloads the log files from S3 and processes them
+7. Processed logs are sent to your Elastic deployment (not created by this project)
+
+### Components Created by this Terraform Project
+
+- ✅ CloudTrail trail configuration
+- ✅ S3 bucket for storing CloudTrail logs with appropriate security settings
+- ✅ SQS queue for S3 notifications
+- ✅ EC2 instance with IAM roles for accessing S3 and SQS
+- ✅ All necessary IAM roles and policies
+
+### Components NOT Created by this Terraform Project
+
+- ❌ Elastic Agent installation and configuration (must be done manually)
+- ❌ Elastic Cloud deployment or any Elastic Stack components
+- ❌ Any additional monitoring or alerting setup
 
 ## Prerequisites
 
