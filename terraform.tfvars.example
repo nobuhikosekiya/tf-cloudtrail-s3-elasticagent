@@ -1,0 +1,24 @@
+# AWS profile to use for authentication
+aws_profile = "default"
+
+# AWS region to deploy resources
+region = "ap-northeast-1"
+
+# Prefix for all resources created
+resource_prefix = "elastic-ct"
+
+# EC2 instance type
+ec2_instance_type = "t3.small"
+
+# EC2 AMI ID
+ec2_ami = "ami-0599b6e53ca798bb2"
+
+# Name for EC2 key pair
+ec2_key_name = "elastic-agent-key"
+
+# Optional: If you want to use specific VPC and subnet
+# vpc_id = "vpc-12345678"
+# subnet_id = "subnet-12345678"
+
+# Tags
+default_tags = {}
