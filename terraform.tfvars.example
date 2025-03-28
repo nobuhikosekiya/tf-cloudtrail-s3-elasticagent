@@ -5,7 +5,7 @@ aws_profile = "default"
 region = "ap-northeast-1"
 
 # Prefix for all resources created
-resource_prefix = "elastic-ct"
+resource_prefix = "tf-cloudtrail-s3-elasticagent"
 
 # EC2 instance type
 ec2_instance_type = "t3.small"
