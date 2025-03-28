@@ -1,7 +1,7 @@
 variable "aws_profile" {
   description = "AWS profile to use for authentication"
   type        = string
-  default     = "elastic-sa"
+  default     = "default"
 }
 
 variable "aws_region" {
@@ -10,16 +10,10 @@ variable "aws_region" {
   default     = "ap-northeast-1"
 }
 
-variable "resource_prefix" {
+variable "prefix" {
   description = "Prefix for all resources created"
   type        = string
-  default     = "elastic-ct"
-}
-
-variable "ec2_ami" {
-  description = "AMI ID for EC2 instance"
-  type        = string
-  default     = "ami-0599b6e53ca798bb2"
+  default     = "cloudtrail-elastic"
 }
 
 variable "ec2_instance_type" {
@@ -28,26 +22,42 @@ variable "ec2_instance_type" {
   default     = "t3.medium"
 }
 
-variable "ec2_key_name" {
-  description = "Name for the EC2 key pair"
+variable "ec2_ami_id" {
+  description = "AMI ID for EC2 instance"
   type        = string
-  default     = "elastic-agent-key"
+  default     = "ami-0599b6e53ca798bb2"
 }
 
-variable "vpc_id" {
-  description = "VPC ID to deploy resources"
+variable "ssh_public_key_path" {
+  description = "Path to SSH public key"
   type        = string
-  default     = null
+  default     = "~/.ssh/id_rsa.pub"
 }
 
-variable "subnet_id" {
-  description = "Subnet ID to deploy EC2 instance"
+variable "s3_bucket_prefix" {
+  description = "Prefix for S3 bucket name"
   type        = string
-  default     = null
+  default     = "logs"
+}
+
+variable "sqs_queue_name" {
+  description = "Name for SQS queue"
+  type        = string
+  default     = "s3-notifications"
+}
+
+variable "lambda_log_level" {
+  description = "Log level for Lambda function"
+  type        = string
+  default     = "INFO"
+  validation {
+    condition     = contains(["DEBUG", "INFO", "WARNING", "ERROR"], var.lambda_log_level)
+    error_message = "Log level must be one of: DEBUG, INFO, WARNING, ERROR"
+  }
 }
 
 variable "default_tags" {
-  description = "AWS default tags for resources"
+  description = "Default tags to apply to all resources"
   type        = map(string)
   default     = {}
 }
