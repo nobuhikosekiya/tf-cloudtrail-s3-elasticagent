@@ -21,7 +21,7 @@ data "aws_subnets" "default" {
 locals {
   account_id     = data.aws_caller_identity.current.account_id
   first_subnet   = tolist(data.aws_subnets.default.ids)[0]
-  bucket_name    = "${var.prefix}-${var.s3_bucket_prefix}-${local.account_id}"
+  bucket_name    = "${var.prefix}-${var.s3_bucket_prefix}"
   queue_name     = "${var.prefix}-${var.sqs_queue_name}"
 }
 
